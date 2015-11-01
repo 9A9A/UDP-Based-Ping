@@ -53,7 +53,7 @@ void ParseRequest ( string &str )
 					cout << "UDP based ping utility. Supports only IPv4 based addresses.\n";
 					cout << "xxx.xxx.xxx.xxx - send 4 packets 32 bytes each\n";
 					cout << "xxx.xxx.xxx.xxx:yyyyy - send 4 packets 32 bytes each to specified port\n";
-					cout << "-s [PACKET SIZE]\tsetup packet size [0 - 1024]\n";
+					cout << "-s [PACKET SIZE]\tsetup packet size [0 - " << MaxBufferSize << "]\n";
 					cout << "-n [PACKET AMOUNT]\tsetup packet amount\n";
 				}
 				ping ( );
@@ -64,7 +64,7 @@ void ParseRequest ( string &str )
 				cout << "Destination ip : " << ip.ToStr ( ) << endl;
 				if ( isNumber ( stringList [ 1 ] ) )
 				{
-					if ( stoi ( stringList [ 1 ] ) < 65535 )
+					if ( stoi ( stringList [ 1 ] ) <= 65535 )
 					{
 						nPort = stoi ( stringList [ 1 ] );
 					}
@@ -103,13 +103,13 @@ void ParseRequest ( string &str )
 						}
 						else if ( stringList [ i ] == "-s" )
 						{
-							if ( stoi ( stringList [ i + 1 ] ) <= 1024 )
+							if ( stoi ( stringList [ i + 1 ] ) <= MaxBufferSize )
 							{
 								packetsize = stoi ( stringList [ i + 1 ] );
 							}
 							else
 							{
-								cout << "Packet size must be lower than 1024\n";
+								cout << "Packet size must be lower than " << MaxBufferSize << endl;
 							}
 							cout << "Packet size : " << packetsize << endl;
 						}
