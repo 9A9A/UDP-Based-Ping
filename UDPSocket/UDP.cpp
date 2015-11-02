@@ -304,6 +304,7 @@ UDPClient::UDPClient ( unsigned short port )
 			WSACleanup ( );
 			throw runtime_error ( "close socket failed\n" );
 		}
+		throw runtime_error ( "unable to create socket\n" );
 	}
 	m_destination.sin_addr.s_addr = inet_addr ( "127.0.0.1" );
 	m_destination.sin_port = htons ( m_port );
