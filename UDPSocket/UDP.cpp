@@ -46,7 +46,9 @@ void ParseRequest ( string &str )
 				if ( stringList [ 0 ] != "-h" )
 				{
 					ip = IPv4 ( stringList [ 0 ] );
+#ifdef _DEBUG
 					cout << "Destination ip : " << ip.ToStr ( ) << endl;
+#endif
 				}
 				else
 				{
@@ -61,7 +63,9 @@ void ParseRequest ( string &str )
 			else if ( stringList.size ( ) == 2 )
 			{
 				ip = IPv4 ( stringList [ 0 ] );
+#ifdef _DEBUG
 				cout << "Destination ip : " << ip.ToStr ( ) << endl;
+#endif
 				if ( isNumber ( stringList [ 1 ] ) )
 				{
 					if ( stoi ( stringList [ 1 ] ) <= 65535 )
@@ -72,14 +76,18 @@ void ParseRequest ( string &str )
 					{
 						cout << "Port value overflow\n";
 					}
+#ifdef _DEBUG
 					cout << "Destination port : " << nPort << endl;
+#endif
 				}
 				ping ( );
 			}
 			else
 			{
 				ip = IPv4 ( stringList [ 0 ] );
+#ifdef _DEBUG
 				cout << "Destination ip : " << ip.ToStr ( ) << endl;
+#endif
 				if ( isNumber ( stringList [ 1 ] ) )
 				{
 					if ( stoi ( stringList [ 1 ] ) < 65535 )
@@ -90,7 +98,9 @@ void ParseRequest ( string &str )
 					{
 						cout << "Port value overflow\n";
 					}
+#ifdef _DEBUG
 					cout << "Destination port : " << nPort << endl;
+#endif
 				}
 				for ( size_t i = 1; i < stringList.size ( ) - 1; i++ )
 				{
@@ -99,7 +109,9 @@ void ParseRequest ( string &str )
 						if ( stringList [ i ] == "-n" )
 						{
 							attempts = stoi ( stringList [ i + 1 ] );
+#ifdef _DEBUG
 							cout << "Packets to send : " << attempts << endl;
+#endif
 						}
 						else if ( stringList [ i ] == "-s" )
 						{
@@ -111,7 +123,9 @@ void ParseRequest ( string &str )
 							{
 								cout << "Packet size must be lower than " << MaxBufferSize << endl;
 							}
+#ifdef _DEBUG
 							cout << "Packet size : " << packetsize << endl;
+#endif
 						}
 					}
 				}
@@ -321,7 +335,7 @@ UDPClient::~UDPClient ( )
 }
 void UDPClient::Ping ( IPv4 &ip , size_t attemps , size_t packet_size )
 {
-	cout << "Destination : " << ip.ToStr ( ) << " - sending packets " << packet_size << " bytes\n";
+	cout << "Destination : [" << ip.ToStr ( ) << ":" << m_port << "] - sending " << attemps << " packets " << packet_size << " bytes\n";
 	m_ip = ip;
 	vector<byte> packet ( packet_size );
 	for ( size_t i = 0; i < packet_size; i++ )
@@ -332,14 +346,21 @@ void UDPClient::Ping ( IPv4 &ip , size_t attemps , size_t packet_size )
 	{
 		Write ( ip , packet );
 		Sleep ( MaxTimeout );
+		if ( m_bWrited )
+		{
+			m_bWrited = false;
+			cout << "Request timed out.\n";
+		}
 	}
 	if ( m_Stats.size ( ) )
 	{
+		cout << "Statistics for [" << m_ip.ToStr ( ) << ":" << m_port << "] :\n";
 		cout << "Sended : " << attemps << "\t\tReceived : " << m_Stats.size ( ) << "\t\tPacket Loss : " << 100 - ( size_t ) ( ( double ) m_Stats.size ( ) * 100 / ( double ) attemps ) << "%\n";
 		cout << "Minimum : " << Min ( m_Stats ) / 1000.0f << "ms\tAverage : " << Average ( m_Stats ) / 1000.0f << "ms\tMaximum : " << Max ( m_Stats ) / 1000.0f << "ms\n";
 	}
 	else
 	{
+		cout << "Statistics for [" << m_ip.ToStr ( ) << ":" << m_port << "] :\n";
 		cout << "Sended : " << attemps << "\t\tReceived : " << m_Stats.size ( ) << "\t\tPacket Loss : " << 100 - ( size_t ) ( ( double ) m_Stats.size ( ) * 100 / ( double ) attemps ) << "%\n";
 		cout << "Minimum : n\\a\t\tAverage : n\\a\t\tMaximum : n\\a\n";
 	}
