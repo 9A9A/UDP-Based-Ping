@@ -276,6 +276,7 @@ void UDPClient::Update ( )
 	char pBuf [ MaxBufferSize ];
 	while ( threadActive )
 	{
+		memset ( pBuf , 0 , MaxBufferSize );
 		int nSize = sizeof ( m_destination );
 		int nResult = recvfrom ( m_socket , pBuf , MaxBufferSize , 0 , NULL , NULL );
 		if ( m_bWrited && threadActive )
@@ -292,7 +293,9 @@ void UDPClient::Update ( )
 		else
 		{
 			m_bWrited = false;
-			cout << pBuf << endl;
+			for ( size_t x = 0; x < nResult; x++ )
+				cout << pBuf [ x ];
+			cout << endl;
 		}
 	}
 #ifdef _DEBUG
@@ -355,13 +358,13 @@ void UDPClient::Ping ( IPv4 &ip , size_t attemps , size_t packet_size )
 	if ( m_Stats.size ( ) )
 	{
 		cout << "Statistics for [" << m_ip.ToStr ( ) << ":" << m_port << "] :\n";
-		cout << "Sended : " << attemps << "\t\tReceived : " << m_Stats.size ( ) << "\t\tPacket Loss : " << 100 - ( size_t ) ( ( double ) m_Stats.size ( ) * 100 / ( double ) attemps ) << "%\n";
+		cout << "Sended : " << attemps << "\t\tReceived : " << m_Stats.size ( ) << "\t\tPacket Loss : " << attemps - m_Stats.size ( ) << " ( " << 100 -( size_t ) ( ( double ) m_Stats.size ( ) * 100 / ( double ) attemps ) << "% )\n";
 		cout << "Minimum : " << Min ( m_Stats ) / 1000.0f << "ms\tAverage : " << Average ( m_Stats ) / 1000.0f << "ms\tMaximum : " << Max ( m_Stats ) / 1000.0f << "ms\n";
 	}
 	else
 	{
 		cout << "Statistics for [" << m_ip.ToStr ( ) << ":" << m_port << "] :\n";
-		cout << "Sended : " << attemps << "\t\tReceived : " << m_Stats.size ( ) << "\t\tPacket Loss : " << 100 - ( size_t ) ( ( double ) m_Stats.size ( ) * 100 / ( double ) attemps ) << "%\n";
+		cout << "Sended : " << attemps << "\t\tReceived : " << m_Stats.size ( ) << "\t\tPacket Loss : " << attemps - m_Stats.size ( ) << " ( " << 100 - ( size_t ) ( ( double ) m_Stats.size ( ) * 100 / ( double ) attemps ) << "% )\n";
 		cout << "Minimum : n\\a\t\tAverage : n\\a\t\tMaximum : n\\a\n";
 	}
 }
