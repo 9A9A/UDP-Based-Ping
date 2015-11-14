@@ -281,14 +281,13 @@ void UDPClient::Update ( )
 		int nResult = recvfrom ( m_socket , pBuf , MaxBufferSize , 0 , NULL , NULL );
 		if ( m_bWrited && threadActive )
 		{
-			interval = duration_cast< microseconds >( system_clock::now ( ).time_since_epoch ( ) - m_SendPoint.time_since_epoch ( ) ).count ( );
+			interval = duration_cast< microseconds >( high_resolution_clock::now ( ).time_since_epoch ( ) - m_SendPoint.time_since_epoch ( ) );
 			m_Stats.push_back ( interval );
-			cout << i++ << ". > " << m_ip.ToStr ( ) << " : " << interval / 1000.0f << " ms\n";
+			cout << i++ << ". > " << m_ip.ToStr ( ) << " : " << ( double ) interval.count ( ) / 1000.0f << " ms\n";
 		}
 		if ( nResult == SOCKET_ERROR )
 		{
 			m_bWrited = false;
-			continue;
 		}
 		else
 		{
@@ -373,7 +372,8 @@ void UDPClient::Write ( IPv4 &addr , vector<byte> &vec )
 	m_ip = addr;
 	m_destination.sin_addr.s_addr = inet_addr ( addr.ToStr ( ).data ( ) );
 	int nResult = sendto ( m_socket , reinterpret_cast< char* >( vec.data ( ) ) , vec.size ( ) , NULL , ( SOCKADDR * ) &m_destination , sizeof ( m_destination ) );
-	m_SendPoint = system_clock::now ( );
+	m_SendPoint = high_resolution_clock::now ( );
+	
 	if ( nResult == SOCKET_ERROR )
 	{
 		cout << "transmission failed\n";

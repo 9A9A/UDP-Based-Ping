@@ -10,6 +10,7 @@
 #include <functional>
 #include <iostream>
 #include <algorithm>
+#include <memory>
 #include <WinSock2.h>
 
 typedef unsigned char byte;
@@ -35,7 +36,7 @@ template<typename _T> double Average ( vector<_T> &vec )
 	double avg = 0;
 	for ( auto &i : vec )
 	{
-		avg += i;
+		avg += i.count();
 	}
 	return avg / vec.size ( );
 }
@@ -44,7 +45,7 @@ template<typename _T> double Max ( vector<_T> &vec )
 	double max = DBL_MIN;
 	for ( auto &i : vec )
 	{
-		max = ( i > max ) ? i : max;
+		max = ( i.count() > max ) ? i.count() : max;
 	}
 	return max;
 }
@@ -53,7 +54,7 @@ template<typename _T> double Min ( vector<_T> &vec )
 	double min = DBL_MAX;
 	for ( auto &i : vec )
 	{
-		min = ( i < min ) ? i : min;
+		min = ( i.count() < min ) ? i.count() : min;
 	}
 	return min;
 }
@@ -87,10 +88,10 @@ private:
 	void StopThread ( );
 
 
-	vector<long long> m_Stats;
-	long long interval;
+	vector<microseconds> m_Stats;
+	microseconds interval;
 	atomic<bool> m_bWrited;
-	system_clock::time_point m_SendPoint;
+	high_resolution_clock::time_point m_SendPoint;
 	SOCKET m_socket;
 	struct sockaddr_in m_destination;
 	atomic<bool> threadActive;
